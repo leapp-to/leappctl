@@ -18,14 +18,19 @@ def cli():
     pass
 
 
-# Modules in leapp.cmd are commands
-pkg_path = os.path.dirname(cmd.__file__)
-for importer, name, is_pkg in pkgutil.iter_modules([pkg_path]):
-    if is_pkg:
-        continue
-    mod = importer.find_module(name).load_module(name)
-    cli.add_command(mod.cli)
+def load_commands():
+    pkg_path = os.path.dirname(cmd.__file__)
+    for importer, name, is_pkg in pkgutil.iter_modules([pkg_path]):
+        if is_pkg:
+            continue
+        mod = importer.find_module(name).load_module(name)
+        cli.add_command(mod.cli)
+
+
+def main():
+    load_commands()
+    cli()
 
 
 if __name__ == '__main__':
-    cli()
+    main()
