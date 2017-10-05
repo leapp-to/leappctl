@@ -1,7 +1,9 @@
+import json
+
 import click
 
-from leappctl.session import get, post
-from leappctl.utils import port_spec
+from leappctl.session import post
+from leappctl.utils import to_port_spec, to_port_map
 
 
 CMD = "migrate-machine"
@@ -55,12 +57,14 @@ This means that the entire system will be converted into a container, possibly b
 @click.option('--tcp-port',
               '-p',
               default=None,
-              type=port_spec,
+              multiple=True,
+              type=to_port_spec,
               help='(Re)define target tcp ports to forward to macrocontainer - [target_port:source_port]')
 @click.option('--excluded-port',
               '-e',
               default=None,
-              type=port_spec,
+              multiple=True,
+              type=to_port_spec,
               help='Define tcp ports which will be excluded from the mapped ports [[target_port]:source_port>]')
 @click.option('--debug',
               '-D',
@@ -68,12 +72,21 @@ This means that the entire system will be converted into a container, possibly b
               default=False,
               help='Turn on debug logging on stderr')
 def cli(**kwargs):
-    # Simple POST
-    resp = post(CMD, kwargs)
-    data = resp.json()
-    click.echo('Response: {0}\n'.format(data['json']['target_host']))
+    req_body = kwargs
 
-    # Simple GET
-    resp1 = get(CMD, kwargs)
-    data = resp1.json()
-    click.echo('Response: {0}\n'.format(data))
+    # Transformations
+    req_body['tcp_ports_user_mapping'] = to_port_map(req_body.pop('tcp_port'))
+    req_body['excluded_tcp_ports'] = {"tcp": {str(x[0]): {"name": ""} for x in req_body['excluded_port'] or ()}}
+    req_body['default_port_map'] = True
+
+    # POST collected data to the appropriate endpoint in leapp-daemon
+    resp = post(CMD, req_body)
+
+    # Pretty-print response
+    resp_body = resp.json()
+    json_pprint = json.dumps(resp_body, sort_keys=True, indent=4, separators=(',', ': '))
+    click.secho(
+        'Response:\n{0}\n'.format(json_pprint),
+        bold=True,
+        fg='green' if resp.status_code == 200 else 'red'
+    )

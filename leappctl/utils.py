@@ -1,8 +1,6 @@
-import os
-
-
-def port_spec(arg):
+def to_port_spec(arg):
     """Converts a port forwarding specifier to a (host_port, container_port) tuple
+
     Specifiers can be either a simple integer, where the host and container port are
     the same, or else a string in the form "host_port:container_port".
     """
@@ -15,8 +13,12 @@ def port_spec(arg):
     return str(host_port), container_port
 
 
-def path_spec(ctx, param, arg):
-    path = os.path.normpath(arg)
-    if not os.path.isabs(path):
-        raise ValueError("Path '{}' is not absolute or valid.".format(str(arg)))
-    return path
+def to_port_map(items):
+    """Converts a (host_port, container_port) tuple into a list of dicts"""
+    port_map = []
+    for target, source in items:
+        port_map.append({
+            'protocol': 'tcp',
+            'exposed_port': int(target),
+            'port': int(source)})
+    return dict(ports=port_map)
