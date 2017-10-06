@@ -8,7 +8,7 @@ from leappctl.compat import urljoin
 
 
 def make_endpoint(cmd):
-    BASE_ENDPOINT = os.getenv('LEAPP_DAEMON_ENDPOINT', 'http://127.0.0.1/v1')
+    BASE_ENDPOINT = os.getenv('LEAPP_DAEMON_ENDPOINT', 'http://127.0.0.1:8000/v1/')
     return urljoin(BASE_ENDPOINT, cmd)
 
 
