@@ -51,13 +51,8 @@ def cli(**kwargs):
             print(html_content)
 
     else:
-        json_pprint = json.dumps(resp_body, sort_keys=True, indent=4, separators=(',', ': '))
         if output_file:
             with open(output_file, 'w+') as f:
-                f.write('Response:\n{0}\n'.format(json_pprint))
+                f.write(json.dumps(resp_body))
         else:
-            click.secho(
-                'Response:\n{0}\n'.format(json_pprint),
-                bold=True,
-                fg='green' if resp.status_code == 200 else 'red'
-            )
+            print(json.dumps(resp_body))
