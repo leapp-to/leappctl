@@ -8,3 +8,7 @@ clean:
 .PHONY: install
 install:
 	python setup.py install
+
+.PHONY: test
+test:
+	py.test tests/*.py
