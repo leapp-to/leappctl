@@ -17,7 +17,7 @@ setup(
     author_email='leapp-devel@redhat.com',
     license="GPLv2+",
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-    install_requires=['click', 'requests'],
+    install_requires=[],
     entry_points={
         'console_scripts': [
             'leappctl=leappctl.cli:main',
